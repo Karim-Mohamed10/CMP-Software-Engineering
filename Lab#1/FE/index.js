@@ -31,22 +31,66 @@ function fetchEmployees() {
 
 // TODO
 // add event listener to submit button
+document.getElementById('employeeForm').addEventListener('submit',function(event){
+  createEmployee()
+});
+
+
 
 // TODO
 // add event listener to delete button
-
+const tableBody = document.getElementById('dataTable');
+tableBody.addEventListener('click', (event) => {
+  if (event.target && event.target.classList.contains('btn-danger')) {
+    deleteEmployee(event.target);
+  }
+});
 // TODO
 function createEmployee (){
+
   // get data from input field
+  const id=document.getElementById('id').value;
+  const name=document.getElementById('name').value;
+
   // send data to BE
+  fetch('http://localhost:3000/api/v1/employee', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id, name }), 
+  })
+    .then(response => response.json())
+    .then(data => { 
+
   // call fetchEmployees
+      fetchEmployees(); 
+    })
+    .catch(error => console.error('Error creating employee:', error))
 }
 
 // TODO
-function deleteEmployee (){
-  // get id
-  // send id to BE
-  // call fetchEmployees
+function deleteEmployee(button) {
+// get data from input field
+  const row = button.closest('tr');
+  if (!row) return console.error('Error: Row not found');
+
+
+  const id = row.cells[0].textContent.trim();
+  if (!id) return console.error('Error: Employee ID not found');
+
+   // send data to BE
+  fetch(`http://localhost:3000/api/v1/employee/${id}`, { 
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => response.json())
+    .then(data => {
+      fetchEmployees();
+    })
+    .catch(error => console.error('Error deleting employee:', error));
 }
 
 fetchEmployees()
